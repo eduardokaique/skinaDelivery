@@ -1,5 +1,7 @@
 const connection = require('../database/connection');
 const crypto = require('crypto');
+const config = require('../config.json');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     async create(request, response) {
@@ -70,5 +72,29 @@ module.exports = {
             });
             
         return response.status(202).send();
+    },
+    async authenticate(request, response) {
+        const { email, password } = request.body;
+        
+        const usuario = await connection('usuario')
+            .where('isDeleted', false)
+            .where('email', email)
+            .first();
+
+        if(usuario.email == email && usuario.password == password)
+        {
+            const token = jwt.sign({ sub: usuario.id }, config.secret);
+
+            return response.status(202)
+                           .json({ 
+                                       usuario: usuario.email ,
+                                       token: token ,
+                                       tokenType: 'Bearer',
+                                       isAuthenticated: true
+                                 });
+        }
+        
+        if(usuario !== null)
+            return response.status(401).json({ error: 'Operation not permitted.' });
     }
 };
