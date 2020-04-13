@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 module.exports = {
     async create(request, response) {
-        const { nome, telefone, endereco, numero, bairro, cidade, uf, email } = request.body;
+        const { nome, telefone, endereco, numero, bairro, cidade, uf, email, password } = request.body;
 
         // const id = crypto.randomBytes(4).toString('HEX');
 
@@ -16,7 +16,8 @@ module.exports = {
             bairro,
             cidade,
             uf,
-            email
+            email,
+            password
         })
 
         return response.status(201).json({ msg: 'Usuário criado!' });
@@ -47,7 +48,7 @@ module.exports = {
         return response.status(204).send();
     },
     async update(request, response) {
-        const { id, nome, telefone, endereco, numero, bairro, cidade, uf, email } = request.body;
+        const { id, nome, telefone, endereco, numero, bairro, cidade, uf, email, password } = request.body;
         // const ong_id = request.headers.authorization;
 
         const modifiedDate = Date.now();
@@ -64,6 +65,7 @@ module.exports = {
                 cidade: cidade, 
                 uf: uf, 
                 email: email,
+                password: password,
                 modifiedDate: modifiedDate
             });
             
