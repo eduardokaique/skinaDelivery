@@ -5,30 +5,22 @@ const jwt = require('jsonwebtoken');
 module.exports = {
     async create(request, response) {
         try {
-            const { nome, telefone, endereco, numero, bairro, cidade, uf, email, password } = request.body;
+            const { descricao, codigo } = request.body;
             const token = request.headers.authorization;
             const { usuarioId } = jwt.verify(token.replace('Bearer ', ''), config.secret);
 
             const loggedUser = await connection('usuario')
-                .where('isDeleted', false)
-                .where('id', usuarioId);
-
+            .where('isDeleted', false)
+            .where('id', usuarioId);
+            
             if (loggedUser) {
-                await connection('usuario').insert({
+                await connection('perfil').insert({
                     // id,
-                    nome,
-                    telefone,
-                    endereco,
-                    numero,
-                    bairro,
-                    cidade,
-                    uf,
-                    email,
-                    password
+                    descricao,
+                    codigo
                 })
-
             }
-            return response.status(201).json({ msg: 'Usuário criado!' });
+            return response.status(201).json({ msg: 'Perfil criado!' });
         } catch (error) {
             return response.status(401).json({ error: error });
         }
@@ -42,7 +34,7 @@ module.exports = {
                 .where('isDeleted', false)
                 .where('id', usuarioId);
             if (loggedUser) {
-                const usuarios = await connection('usuario')
+                const usuarios = await connection('perfil')
                     .where('isDeleted', false)
                     .select('*');
 
@@ -63,19 +55,19 @@ module.exports = {
                 .where('isDeleted', false)
                 .where('id', usuarioId);
             if (loggedUser) {
-                const usuario = await connection('usuario')
+                const perfil = await connection('perfil')
                     .where('id', id)
                     .first();
 
-                if(usuario)
+                if(perfil)
                 {
-                    await connection('usuario')
+                    await connection('perfil')
                     .where('id', id)
                     .update('isDeleted', true);
                     return response.status(204).send();
                 }else
                 {
-                    return response.status(400).json({ error: 'Usuário não cadastrado.' });
+                    return response.status(400).json({ error: 'Perfil não cadastrado.' });
                 }
                 
             }
@@ -85,7 +77,7 @@ module.exports = {
     },
     async update(request, response) {
         try {
-            const { id, nome, telefone, endereco, numero, bairro, cidade, uf, email, password } = request.body;
+            const { id, descricao, valor } = request.body;
             const token = request.headers.authorization;
             const { usuarioId } = jwt.verify(token.replace('Bearer ', ''), config.secret);
 
@@ -96,20 +88,11 @@ module.exports = {
 
         const modifiedDate = Date.now();
 
-        await connection('usuario')
+        await connection('perfil')
             .where('id', id)
             .update({
-                nome: nome,
-                telefone: telefone,
-                endereco: telefone,
-                endereco: endereco,
-                numero: numero,
-                bairro: bairro,
-                cidade: cidade,
-                uf: uf,
-                email: email,
-                password: password,
-                modifiedDate: modifiedDate
+                descricao: descricao,
+                valor: valor
             });
 
         return response.status(202).send();
@@ -117,28 +100,5 @@ module.exports = {
         } catch (error) {
             return response.status(401).json({ error: error });
         }
-    },
-    async authenticate(request, response) {
-        const { email, password } = request.body;
-
-        const usuario = await connection('usuario')
-            .where('isDeleted', false)
-            .where('email', email)
-            .first();
-
-        if (usuario.email == email && usuario.password == password) {
-            const token = jwt.sign({ usuarioId: usuario.id }, config.secret);
-
-            return response.status(202)
-                .json({
-                    usuario: usuario.email,
-                    token: 'Bearer ' + token,
-                    tokenType: 'Bearer',
-                    isAuthenticated: true
-                });
-        }
-
-        if (usuario !== null)
-            return response.status(401).json({ error: 'Operation not permitted.' });
     }
 };
