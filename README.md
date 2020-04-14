@@ -3,7 +3,7 @@
 Projeto com objetivo de resolver problemas de comerciantes que querem fugir da burocracia dos principais aplicativo de  
 Delivery Food que temos no mercado.
 
-Foi pensado para trazer inclusão para qualquer nicho de comerciante.
+Foi pensado para trazer inclusão a qualquer nicho de comerciante.
 
 Tecnologias utilizadas:
 - backend: node
