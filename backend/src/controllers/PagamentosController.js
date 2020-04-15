@@ -91,7 +91,7 @@ module.exports = {
         await connection('pagamento')
             .where('id', id)
             .update({
-                modifiedDate = modifiedDate,
+                modifiedDate: modifiedDate,
                 descricao: descricao,
                 valor: valor
             });
